@@ -50,16 +50,16 @@ print("Access to quality.check:", access_qc)
 filtro_qc = [[['measure', '=', 0]]]
 
 # Buscar IDs de registros que cumplan con el filtro
-ids_qc = models.execute_kw(db, uid, password, 'quality.check', 'search', filtro_qc)
+ids_qc = models.execute_kw(db, uid, password, 'quality.check', 'search', filtro_qc, {'limit': 100})
 print("IDs encontrados en quality.check:", ids_qc)
 
 # Obtener registros seleccionados de quality.check incluyendo product_id
-atributos_qc = models.execute_kw(db, uid, password, 'quality.check', 'read', [ids_qc], {'fields': ['measure','quality_state','x_studio_nombre_de_control','x_studio_empleado','lot_id','point_id','measure_on','test_type_id','production_id','product_id']})
+atributos_qc = models.execute_kw(db, uid, password, 'quality.check', 'read', [ids_qc], {'fields': ['measure','quality_state','x_studio_nombre_de_control','x_studio_empleado','lot_id','point_id','measure_on','test_type_id','production_id','product_id','test_type','quality_state','team_id','company_id']})
 print("Atributos de quality.check:", atributos_qc)
 
 # Asociar registros de quality.check con mrp.workorder usando product_id
 for attr in atributos:
-    attr['quality.check'] = [qc for qc in atributos_qc if 'product_id' in qc and qc['product_id'] and qc['product_id'][0] == attr['product_id'][0]]
+    attr['quality_checks'] = [qc for qc in atributos_qc if 'product_id' in qc and qc['product_id'] and qc['product_id'][0] == attr['product_id'][0]]
 
 # Definir la URL para la solicitud POST
 post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1/initialize'
