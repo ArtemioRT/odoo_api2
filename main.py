@@ -10,16 +10,19 @@ password = 'D4n13LM4r333st!'
 
 # Verificar conectividad
 common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
-common.version()
+version = common.version()
+print("Odoo version:", version)
 
 # Autenticación
 uid = common.authenticate(db, username, password, {})
+print("Authenticated UID:", uid)
 
 # Llamar al endpoint para usar métodos de los modelos de Odoo
 models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
 
 # Validar acceso al modelo mrp.workorder
-models.execute_kw(db, uid, password, 'mrp.workorder', 'check_access_rights', ['read'], {'raise_exception': False})
+access_mrp = models.execute_kw(db, uid, password, 'mrp.workorder', 'check_access_rights', ['read'], {'raise_exception': False})
+print("Access to mrp.workorder:", access_mrp)
 
 # Obtener la fecha de hoy y hace dos días
 hoy = datetime.date.today()
@@ -33,21 +36,26 @@ filtro = [[['state', '=', 'done'],
 
 # Buscar IDs de registros que cumplan con el filtro
 ids = models.execute_kw(db, uid, password, 'mrp.workorder', 'search', filtro, {'limit': 1000})
-    
+print("IDs encontrados en mrp.workorder:", ids)
+
 # Obtener registros seleccionados
 atributos = models.execute_kw(db, uid, password, 'mrp.workorder', 'read', [ids], {'fields': ['id', 'name', 'production_id', 'x_studio_empleado', 'finished_lot_id', 'date_start', 'date_finished', 'product_id']})
+print("Atributos de mrp.workorder:", atributos)
 
 # Validar acceso al modelo quality.check
-models.execute_kw(db, uid, password, 'quality.check', 'check_access_rights', ['read'], {'raise_exception': False})
+access_qc = models.execute_kw(db, uid, password, 'quality.check', 'check_access_rights', ['read'], {'raise_exception': False})
+print("Access to quality.check:", access_qc)
 
 # Filtrar registros en quality.check donde measure sea 0 y por name=Tapiz
 filtro_qc = [[['measure', '=', 0],['name', '=', 'Tapiz']]]
 
 # Buscar IDs de registros que cumplan con el filtro
 ids_qc = models.execute_kw(db, uid, password, 'quality.check', 'search', filtro_qc)
+print("IDs encontrados en quality.check:", ids_qc)
 
 # Obtener registros seleccionados de quality.check incluyendo product_id
 atributos_qc = models.execute_kw(db, uid, password, 'quality.check', 'read', [ids_qc], {'fields': ['measure','quality_state','x_studio_nombre_de_control','x_studio_empleado','lot_id','point_id','measure_on','test_type_id','production_id']})
+print("Atributos de quality.check:", atributos_qc)
 
 # Asociar registros de quality.check con mrp.workorder usando product_id
 for attr in atributos:
@@ -58,6 +66,7 @@ post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1'
 
 # Definir los datos del payload
 payload = {'atributos': atributos}
+print("Payload:", payload)
 
 # Enviar la solicitud POST
 response = requests.post(post_url, json=payload)
@@ -66,4 +75,4 @@ response = requests.post(post_url, json=payload)
 if response.status_code == 200:
     print('POST request successful')
 else:
-    print('POST request failed')
+    print('POST request failed, status code:', response.status_code, "response:", response.text)
