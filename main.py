@@ -66,7 +66,7 @@ post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1/i
 
 # Definir los datos del payload
 payload = {
-    'atributos_mrp_workorder': atributos,
+    
     'atributos_quality_check': atributos_qc
 }
 print("Payload:", payload)
