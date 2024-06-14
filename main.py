@@ -64,34 +64,18 @@ for attr in atributos:
 # Definir la URL para la solicitud POST
 post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1/initialize'
 
-# Enviar solicitudes POST separadas para cada registro en mrp.workorder
-for atributo in atributos:
-    payload = {
-        'id_mrp_workorder': atributo['id'],
-        'atributo_mrp_workorder': atributo
-    }
-    print("Payload MRP Workorder:", payload)
-    
-    response = requests.post(post_url, json=payload)
-    
-    # Verificar el estado de la respuesta para mrp.workorder
-    if response.status_code == 200:
-        print(f'POST request for MRP Workorder ID {atributo["id"]} successful')
-    else:
-        print(f'POST request for MRP Workorder ID {atributo["id"]} failed, status code:', response.status_code, "response:", response.text)
+# Definir los datos del payload
+payload = {
+    'atributos_mrp_workorder': atributos,
+    'atributos_quality_check': atributos_qc
+}
+print("Payload:", payload)
 
-# Enviar solicitudes POST separadas para cada registro en quality.check
-for atributo_qc in atributos_qc:
-    payload = {
-        'id_quality_check': atributo_qc['id'],
-        'atributo_quality_check': atributo_qc
-    }
-    print("Payload Quality Check:", payload)
-    
-    response = requests.post(post_url, json=payload)
-    
-    # Verificar el estado de la respuesta para quality.check
-    if response.status_code == 200:
-        print(f'POST request for Quality Check ID {atributo_qc["id"]} successful')
-    else:
-        print(f'POST request for Quality Check ID {atributo_qc["id"]} failed, status code:', response.status_code, "response:", response.text)
+# Enviar la solicitud POST
+response = requests.post(post_url, json=payload)
+
+# Verificar el estado de la respuesta
+if response.status_code == 200:
+    print('POST request successful')
+else:
+    print('POST request failed, status code:', response.status_code, "response:", response.text)
