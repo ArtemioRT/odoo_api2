@@ -57,25 +57,37 @@ print("IDs encontrados en quality.check:", ids_qc)
 atributos_qc = models.execute_kw(db, uid, password, 'quality.check', 'read', [ids_qc], {'fields': ['measure','quality_state','x_studio_nombre_de_control','x_studio_empleado','lot_id','point_id','measure_on','test_type_id','production_id','product_id','test_type','quality_state','team_id','company_id']})
 print("Atributos de quality.check:", atributos_qc)
 
-# Asociar registros de quality.check con mrp.workorder usando product_id
-for attr in atributos:
-    attr['quality_checks'] = [qc for qc in atributos_qc if 'product_id' in qc and qc['product_id'] and qc['product_id'][0] == attr['product_id'][0]]
-
 # Definir la URL para la solicitud POST
-post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1'
+post_url_mrp = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1_mrp'
+post_url_qc = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1_qc'
 
-# Definir los datos del payload
-payload = {
-    'atributos_mrp_workorder': atributos,
+# Definir los datos del payload para mrp.workorder
+payload_mrp = {
+    'atributos_mrp_workorder': atributos
+}
+print("Payload MRP Workorder:", payload_mrp)
+
+# Enviar la solicitud POST para mrp.workorder
+response_mrp = requests.post(post_url_mrp, json=payload_mrp)
+
+# Verificar el estado de la respuesta para mrp.workorder
+if response_mrp.status_code == 200:
+    print('POST request for MRP Workorder successful')
+else:
+    print('POST request for MRP Workorder failed, status code:', response_mrp.status_code, "response:", response_mrp.text)
+
+# Definir los datos del payload para quality.check
+payload_qc = {
     'atributos_quality_check': atributos_qc
 }
-print("Payload:", payload)
+print("Payload Quality Check:", payload_qc)
 
-# Enviar la solicitud POST
-response = requests.post(post_url, json=payload)
+# Enviar la solicitud POST para quality.check
+response_qc = requests.post(post_url_qc, json=payload_qc)
 
-# Verificar el estado de la respuesta
-if response.status_code == 200:
-    print('POST request successful')
+# Verificar el estado de la respuesta para quality.check
+if response_qc.status_code == 200:
+    print('POST request for Quality Check successful')
 else:
-    print('POST request failed, status code:', response.status_code, "response:", response.text)
+    print('POST request for Quality Check failed, status code:', response_qc.status_code, "response:", response_qc.text)
+
