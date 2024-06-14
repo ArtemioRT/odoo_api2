@@ -62,7 +62,7 @@ for attr in atributos:
     attr['quality_checks'] = [qc for qc in atributos_qc if 'product_id' in qc and qc['product_id'] and qc['product_id'][0] == attr['product_id'][0]]
 
 # Definir la URL para la solicitud POST
-post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1'
+post_url = 'https://nuvaapp.bubbleapps.io/version-test/api/1.1/wf/crear_ot_pt1/initialize'
 
 # Definir los datos del payload
 payload = {
